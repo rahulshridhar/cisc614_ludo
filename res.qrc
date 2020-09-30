@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>all.png</file>
+        <file>blue.png</file>
+        <file>bluefinish.png</file>
+        <file>bluegreen.png</file>
+        <file>bluepawn.png</file>
+        <file>bluestart.png</file>
+        <file>border.png</file>
+        <file>green.png</file>
+        <file>greenfinish.png</file>
+        <file>greenpawn.png</file>
+        <file>greenstart.png</file>
+        <file>ludo.JPG</file>
+        <file>red.png</file>
+        <file>redblue.png</file>
+        <file>redfinish.png</file>
+        <file>redpawn.png</file>
+        <file>redstart.png</file>
+        <file>redyellow.png</file>
+        <file>white.png</file>
+        <file>yellow.png</file>
+        <file>yellowfinish.png</file>
+        <file>yellowgreen.png</file>
+        <file>yellowpawn.png</file>
+        <file>yellowstart.png</file>
+    </qresource>
+</RCC>
