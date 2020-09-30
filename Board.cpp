@@ -12,6 +12,7 @@ Board::~Board()
     delete scene;
 }
 
+// draw the ludo board
 void Board::draw() {
     QPixmap img(":/images/border.png");
     QGraphicsPixmapItem *rect = this->addPixmap(img);
