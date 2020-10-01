@@ -16,7 +16,8 @@ SOURCES += \
 HEADERS += \
     Board.h \
     Dice.h \
-    Node.h
+    Node.h \
+    Pixel.h 
 
 FORMS +=
 
