@@ -1,10 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
 
-class Node {
+struct Node {
     int x;
     int y;
-public:
     Node(int x_, int y_) : x(x_), y(y_) {};
 };
 
