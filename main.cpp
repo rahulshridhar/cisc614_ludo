@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
 
     QGraphicsView *view = new QGraphicsView(scene);
     view->show();
-    view->setFixedSize(800, 600);
+    view->setFixedSize(1000, 800);
 
+    scene->setSceneRect(0, 0, 1000, 800);
     scene->draw();
 
     return a.exec();
