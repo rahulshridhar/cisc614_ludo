@@ -15,71 +15,103 @@ Board::~Board()
 
 // draw the ludo board
 void Board::draw() {
-    Node curr_pos(535, 15);
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 4; j++) {
-            draw_pixel(play_fields, curr_pos, directions[i], ":/images/border.png");
-        }
-    }
-    for (int j = 0; j < 2; j++) draw_pixel(play_fields, curr_pos, directions[0], ":/images/border.png");
-    for (int j = 0; j < 4; j++) draw_pixel(play_fields, curr_pos, directions[3], ":/images/border.png");
-    for (int j = 0; j < 4; j++) draw_pixel(play_fields, curr_pos, directions[0], ":/images/border.png");
-    for (int j = 0; j < 2; j++) draw_pixel(play_fields, curr_pos, directions[3], ":/images/border.png");
-    for (int i = 2; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            draw_pixel(play_fields, curr_pos, directions[i], ":/images/border.png");
-        }
-    }
+    Node current_pos(350, 770);
+    int i,j;
 
-    for (int j = 0; j < 2; j++) draw_pixel(play_fields, curr_pos, directions[2], ":/images/border.png");
+    // 10 fields per color
+    for(i=0; i<4; ++i) { //drawing fields to play
 
-    for (int i = 1; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            draw_pixel(play_fields, curr_pos, directions[i], ":/images/border.png");
-        }
+        for(j=0; j<4; ++j)
+            draw_pixel(play_fields, current_pos, directions[i], ":/images/border.png");
+
+        //draw_pixel(play_fields, current_pos, directions[(i+3)%4], ":/images/border.png");
+        //draw_pixel(play_fields, current_pos, directions[i], ":/images/border.png");
+
+        for(j=0; j<4; ++j)
+            draw_pixel(play_fields, current_pos, directions[(i+3)%4], ":/images/border.png");
+
+        for(j=0; j<2; ++j)
+            draw_pixel(play_fields, current_pos, directions[i], ":/images/border.png");
+
     }
 
-    for (int j = 0; j < 2; j++) draw_pixel(play_fields, curr_pos, directions[1], ":/images/border.png");
+    //setting backgrounds of start-fields
+    play_fields.at(0)->set_Pixmap(QPixmap(":/images/bluestart.png"));
+    play_fields.at(10)->set_Pixmap(QPixmap(":/images/redstart.png"));
+    play_fields.at(20)->set_Pixmap(QPixmap(":/images/yellowstart.png"));
+    play_fields.at(30)->set_Pixmap(QPixmap(":/images/greenstart.png"));
+    /////////////////////////////////////
 
-    //Setup home bases for all players
-    Node yellow_base(700, 70);
-    for (int j = 0; j < 4; j++) draw_pixel(yellow_fields, yellow_base, directions[j], ":/images/yellowpawn.png");
+    //drawing basement and finish of each player
+    current_pos.x = 70;
+    current_pos.y = 70;
+    for(j=0; j<4; ++j)
+        draw_pixel(red_fields, current_pos, directions[(j+1)%4], ":/images/redpawn.png");
 
-    Node green_base(700, 600);
-    for (int j = 0; j < 4; j++) draw_pixel(green_fields, green_base, directions[j], ":/images/greenpawn.png");
+    current_pos.x = 140;
+    current_pos.y = 420;
+    for(j=0; j<4; ++j)
+        draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    Node blue_base(140, 600);
-    for (int j = 0; j < 4; j++) draw_pixel(blue_fields, blue_base, directions[j], ":/images/bluepawn.png");
+    //Player *playerRed = new Player(play_fields.at(12), red_fields, 'r', 12);
+    //red was drawn
 
-    Node red_base(140, 70);
-    for (int j = 0; j < 4; j++) draw_pixel(red_fields, red_base, directions[j], ":/images/redpawn.png");
+    current_pos.x = 700;
+    current_pos.y = 70;
 
-    //Setup finish locations for all players
-    Node yellow_finish(465, 85);
-    for (int j = 0; j < 4; j++) draw_pixel(yellow_fields, yellow_finish, directions[0], ":/images/yellowfinish.png");
+    for(j=0; j<4; ++j)
+        draw_pixel(yellow_fields, current_pos, directions[(j+1)%4], ":/images/yellowpawn.png");
 
-    Node green_finish(535, 365);
-    for (int j = 0; j < 4; j++) draw_pixel(green_fields, green_finish, directions[1], ":/images/greenfinish.png");
+    current_pos.x = 420;
+    current_pos.y = 140;
+    for(j=0; j<4; ++j)
+        draw_pixel(yellow_fields, current_pos, directions[2], ":/images/yellowfinish.png");
 
-    Node blue_finish(465, 435);
-    for (int j = 0; j < 4; j++) draw_pixel(blue_fields, blue_finish, directions[0], ":/images/bluefinish.png");
+    //Player *playerYellow = new Player(play_fields.at(24), yellow_fields, 'y', 24);
+    //yellow was drawn
 
-    Node red_finish(395, 365);
-    for (int j = 0; j < 4; j++) draw_pixel(red_fields, red_finish, directions[3], ":/images/redfinish.png");
+    current_pos.x = 700;
+    current_pos.y = 700;
+    for(j=0; j<4; ++j)
+        draw_pixel(green_fields, current_pos, directions[(j+1)%4], ":/images/greenpawn.png");
 
-     // draw center pixel
-     Node center_pos(465, 365);
-     Node center_no_next(0, 0);
-     draw_pixel(center_field, center_pos, center_no_next, ":/images/all.png");
+    current_pos.x = 700;
+    current_pos.y = 420;
+    for(j=0; j<4; ++j)
+        draw_pixel(green_fields, current_pos, directions[3], ":/images/greenfinish.png");
+
+    //Player *playerGreen = new Player(play_fields.at(36), green_fields, 'g', 36);
+    //green was drawn
+
+    current_pos.x = 70;
+    current_pos.y = 700;
+
+    for(j=0; j<4; ++j)
+        draw_pixel(blue_fields, current_pos, directions[(j+1)%4], ":/images/bluepawn.png");
+
+    current_pos.x = 420;
+    current_pos.y = 700;
+    for(j=0; j<4; ++j)
+        draw_pixel(blue_fields, current_pos, directions[0], ":/images/bluefinish.png");
+
+    current_pos.x = 420;
+    current_pos.y = 420;
+    draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
+    //Player *playerBlue = new Player(play_fields.at(0), blue_fields, 'b', 0);
+
+    //players.push_back(playerBlue);
+    //players.push_back(playerRed);
+    //players.push_back(playerYellow);
+    //players.push_back(playerGreen);
 
      //Set background to a dark color
      this->setBackgroundBrush(Qt::darkCyan);
 }
 
-void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move, QString img_path)
+void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move, QString images_path)
 {
-     QPixmap img(img_path);
-     QGraphicsPixmapItem *pix = this->addPixmap(img);
+     QPixmap images(images_path);
+     QGraphicsPixmapItem *pix = this->addPixmap(images);
      pix->setPos(curr_pos.x, curr_pos.y);
      vec.push_back(new Pixel(pix));
 
