@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     view->show();
     view->setFixedSize(1000, 800);
 
-    scene->setSceneRect(0, 0, 1000, 800);
+    scene->setSceneRect(0, 0, 1000, 900);
     scene->draw();
 
     return a.exec();
