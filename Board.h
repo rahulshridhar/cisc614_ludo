@@ -26,9 +26,9 @@ public:
     const int pixel_size = 70;
 
     std::vector<Node> directions = {
-        {0, pixel_size}, //down
-        {pixel_size, 0}, //right
         {0, -pixel_size}, //up
+        {pixel_size, 0}, //right
+        {0, pixel_size}, //down
         {-pixel_size, 0}  //left
     };
 };
