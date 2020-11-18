@@ -5,6 +5,7 @@
 #include <Dice.h>
 #include <Pixel.h>
 #include <Node.h>
+#include <Player.h>
 
 class Board : public QGraphicsScene {
 private:
@@ -16,6 +17,7 @@ private:
     std::vector<Pixel*> green_fields;
     std::vector<Pixel*> yellow_fields;
     std::vector<Pixel*> center_field;
+    std::vector<Player*> players;
 
 public:
     Board();

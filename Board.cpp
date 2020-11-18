@@ -1,4 +1,5 @@
 #include "Board.h"
+#include "Player.h"
 #include <QGraphicsPixmapItem>
 
 Board::Board()
@@ -53,7 +54,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    //Player *playerRed = new Player(play_fields.at(12), red_fields, 'r', 12);
+    Player *playerRed = new Player(play_fields.at(10), red_fields, 'r', 10);
     //red was drawn
 
     current_pos.x = 700;
@@ -67,7 +68,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(yellow_fields, current_pos, directions[2], ":/images/yellowfinish.png");
 
-    //Player *playerYellow = new Player(play_fields.at(24), yellow_fields, 'y', 24);
+    Player *playerYellow = new Player(play_fields.at(20), yellow_fields, 'y', 20);
     //yellow was drawn
 
     current_pos.x = 700;
@@ -80,7 +81,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(green_fields, current_pos, directions[3], ":/images/greenfinish.png");
 
-    //Player *playerGreen = new Player(play_fields.at(36), green_fields, 'g', 36);
+    Player *playerGreen = new Player(play_fields.at(30), green_fields, 'g', 30);
     //green was drawn
 
     current_pos.x = 70;
@@ -97,12 +98,12 @@ void Board::draw() {
     current_pos.x = 420;
     current_pos.y = 420;
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
-    //Player *playerBlue = new Player(play_fields.at(0), blue_fields, 'b', 0);
+    Player *playerBlue = new Player(play_fields.at(0), blue_fields, 'b', 0);
 
-    //players.push_back(playerBlue);
-    //players.push_back(playerRed);
-    //players.push_back(playerYellow);
-    //players.push_back(playerGreen);
+    players.push_back(playerBlue);
+    players.push_back(playerRed);
+    players.push_back(playerYellow);
+    players.push_back(playerGreen);
 
      //Set background to a dark color
      this->setBackgroundBrush(Qt::darkCyan);
