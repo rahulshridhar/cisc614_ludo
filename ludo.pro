@@ -11,13 +11,17 @@ CONFIG += c++11
 SOURCES += \
     Board.cpp \
     Dice.cpp \
+    Pawn.cpp \
+    Player.cpp \
     main.cpp
 
 HEADERS += \
     Board.h \
     Dice.h \
     Node.h \
-    Pixel.h 
+    Pawn.h \
+    Pixel.h  \
+    Player.h
 
 FORMS +=
 
