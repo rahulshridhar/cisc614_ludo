@@ -3,6 +3,7 @@
 
 class Dice {
 public:
+    Dice() = default;
     int roll();
 };
 
