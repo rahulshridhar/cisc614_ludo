@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 
     scene->setSceneRect(0, 0, 1000, 900);
     scene->draw();
+    scene->play();
 
     return a.exec();
 }
