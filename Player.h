@@ -30,6 +30,8 @@ public:
     std::vector<int> get_active_pawns();
     int pick_random_index(int length);
     void set_pawn_on_field(int index);
+    void reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*> players, std::vector<Pixel*> play_fields);
+    int move_board_pawn(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
 };
 
 #endif // PLAYER_H
