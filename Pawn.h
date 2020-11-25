@@ -7,15 +7,17 @@ class Pawn {
     int start;
     Pixel* current_pos;
     std::string color;
+    int base_location;
     int moves = 0;
 
 public:
-    //Pixel* curr_location;
-    Pawn(Pixel* start_point, int start, std::string color);
+    Pawn(Pixel* start_point, int start, std::string color, int location);
     std::string get_color() { return color; }
-    Pixel* get_current_pos() { return current_pos; }
+    Pixel*& get_current_pos() { return current_pos; }
     void set_current_pos(Pixel* p) { current_pos = p; }
     bool move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish);
+    int get_base_location() { return base_location; }
+    void reset_moves() { moves = 0; }
     ~Pawn();
 
 };
