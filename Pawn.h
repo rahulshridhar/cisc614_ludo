@@ -18,6 +18,9 @@ public:
     bool move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish);
     int get_base_location() { return base_location; }
     void reset_moves() { moves = 0; }
+    void increment_move() { moves += 1; }
+    int get_moves() { return moves; }
+    int get_start() { return start; }
     ~Pawn();
 
 };
