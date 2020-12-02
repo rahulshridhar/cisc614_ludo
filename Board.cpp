@@ -1,10 +1,11 @@
 #include "Board.h"
 #include "Player.h"
 #include <QGraphicsPixmapItem>
+#include <iostream>
 
 Board::Board()
 {
-    scene = new QGraphicsScene();
+    //scene = new QGraphicsScene();
     dice = new Dice();
 
     timer = new QTimer(this);
@@ -15,7 +16,7 @@ Board::Board()
 Board::~Board()
 {
     for (auto& i : play_fields) delete i;
-    for (int i = 0; i < red_fields.size(); i++) {
+    for (unsigned int i = 0; i < red_fields.size(); i++) {
         delete red_fields[i];
         delete blue_fields[i];
         delete green_fields[i];
@@ -25,11 +26,16 @@ Board::~Board()
 
     delete dice;
     delete timer;
-    delete scene;
+    //delete scene;
+    delete view;
 }
 
 // draw the ludo board
 void Board::draw() {
+    view = new QGraphicsView(this);
+    view->show();
+    view->setFixedSize(1000, 800);
+
     Node current_pos(350, 770);
     int i,j;
 
@@ -65,7 +71,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10);
+    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::FAST);
     //red was drawn
 
     current_pos.x = 700;
@@ -79,7 +85,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(yellow_fields, current_pos, directions[2], ":/images/yellowfinish.png");
 
-    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20);
+    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20, strategy::FAST);
     //yellow was drawn
 
     current_pos.x = 700;
@@ -92,7 +98,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(green_fields, current_pos, directions[3], ":/images/greenfinish.png");
 
-    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30);
+    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30, strategy::FAST);
     //green was drawn
 
     current_pos.x = 70;
@@ -109,7 +115,7 @@ void Board::draw() {
     current_pos.x = 420;
     current_pos.y = 420;
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
-    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0);
+    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::FAST);
 
     players.push_back(player_blue);
     players.push_back(player_red);
@@ -131,9 +137,10 @@ void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move
      curr_pos.y += next_move.y;
 }
 
-void Board::play() {
+int Board::play() {
+    int curr_player = turn;
+    //int play_next = players[turn]->move(die_rolls[die_index++], players, play_fields);
     int play_next = players[turn]->move(dice, players, play_fields);
-
     if(play_next) {
 
         turn++;
@@ -169,6 +176,10 @@ void Board::play() {
                 green_fields.at(i)->set_Pixmap(QPixmap(":/images/greenfinish.png"));
         }
 
-        QTimer::singleShot(200, [this] { play(); } );
+        QTimer::singleShot(50, [this] { play(); } );
     }
+    if (curr_player == turn) {
+        return 1;
+    }
+    return 0;
 }
