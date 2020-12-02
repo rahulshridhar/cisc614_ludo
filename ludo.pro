@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     Board.cpp \
+    Common.cpp \
     Dice.cpp \
     Pawn.cpp \
     Player.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     Board.h \
+    Common.h \
     Dice.h \
     Node.h \
     Pawn.h \
