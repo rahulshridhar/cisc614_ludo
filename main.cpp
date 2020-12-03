@@ -1,41 +1,71 @@
 #include <QApplication>
 #include "Board.h"
 #include <iostream>
+#include <QObject>
+#include <unistd.h>
 
-int total_games = 1;
-int blue_wins = 0;
-int red_wins = 0;
-int yellow_wins = 0;
-int green_wins = 0;
+bool display_gui = false;
 
 int main(int argc, char *argv[])
 {
-    for (int i = 0; i < total_games; i++) {
-        QApplication a(argc, argv);
 
+    int total_games = 100;
+    int blue_wins = 0, blue_moves = 0;
+    int red_wins = 0, red_moves = 0;
+    int yellow_wins = 0, yellow_moves = 0;
+    int green_wins = 0, green_moves = 0;
+
+
+    QApplication a(argc, argv);
+    for (int i = 0; i < total_games; i++) {
         Board *board = new Board();
 
-        board->setSceneRect(0, 0, 1000, 900);
+        board->get_scene()->setSceneRect(0, 0, 1000, 900);
         board->draw();
-        board->play();
+        board->play(display_gui);
 
-        //QObject::connect(scene, &Board::exit, &a, &QApplication::quit, Qt::QueuedConnection);
-        //if (scene->play()) emit scene->exit();
+        if (display_gui) a.exec();
 
-        a.exec();
         //blue = 0, red = 1, yellow = 2, green = 3
-        if (board->get_turn() == 0) blue_wins++;
-        else if (board->get_turn() == 1) red_wins++;
-        else if (board->get_turn() == 2) yellow_wins++;
-        else if (board->get_turn() == 3) green_wins++;
+        if (board->get_turn() == 0) {
+            //std::cout<<"Blue wins!!!"<<std::endl;
+            blue_wins++;
+            blue_moves += board->get_players().at(0)->get_moves();
+        }
+        else if (board->get_turn() == 1) {
+            //std::cout<<"Red wins!!!"<<std::endl;
+            red_wins++;
+            red_moves += board->get_players().at(1)->get_moves();
+        }
+        else if (board->get_turn() == 2) {
+            //std::cout<<"Yellow wins!!!"<<std::endl;
+            yellow_wins++;
+            yellow_moves += board->get_players().at(2)->get_moves();
+        }
+        else if (board->get_turn() == 3) {
+            //std::cout<<"Green wins!!!"<<std::endl;
+            green_wins++;
+            green_moves += board->get_players().at(3)->get_moves();
+        }
 
         delete board;
     }
 
+    // Compute win percentages and average moves taken during a player's win
+    double blue_win_pc = blue_wins*100/total_games;
+    double red_win_pc = red_wins*100/total_games;
+    double yellow_win_pc = yellow_wins*100/total_games;
+    double green_win_pc = green_wins*100/total_games;
+    int avg_blue_moves = blue_moves ? blue_moves/blue_wins : 0;
+    int avg_red_moves = red_moves ? red_moves/red_wins : 0;
+    int avg_yellow_moves = yellow_moves ? yellow_moves/yellow_wins : 0;
+    int avg_green_moves = green_moves ? green_moves/green_wins : 0;
+
     std::cout << "Total games = " << total_games << std::endl;
-    std::cout << "Blue wins = " << blue_wins << std::endl;
-    std::cout << "Red wins = " << red_wins << std::endl;
-    std::cout << "Yellow wins = " << yellow_wins << std::endl;
-    std::cout << "Green wins = " << green_wins << std::endl;
-    return 0;
+    std::cout << "Blue %-win = " << blue_win_pc << " Average moves = " << avg_blue_moves << std::endl;
+    std::cout << "Red %-win = " << red_win_pc << " Average moves = " << avg_red_moves << std::endl;
+    std::cout << "Yellow %-win = " << yellow_win_pc << " Average moves = " << avg_yellow_moves << std::endl;
+    std::cout << "Green %-win = " << green_win_pc << " Average moves = " << avg_green_moves << std::endl;
+
+    return a.exec();
 }

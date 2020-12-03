@@ -2,14 +2,20 @@
 #include "Player.h"
 #include <QGraphicsPixmapItem>
 #include <iostream>
+#include <unistd.h>
 
 Board::Board()
 {
-    //scene = new QGraphicsScene();
+    scene = new QGraphicsScene();
+
+    view = new QGraphicsView(scene);
+    view->show();
+    view->setFixedSize(1000, 800);
+
     dice = new Dice();
 
     timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    //connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000);
 }
 
@@ -26,16 +32,12 @@ Board::~Board()
 
     delete dice;
     delete timer;
-    //delete scene;
     delete view;
+    delete scene;
 }
 
 // draw the ludo board
 void Board::draw() {
-    view = new QGraphicsView(this);
-    view->show();
-    view->setFixedSize(1000, 800);
-
     Node current_pos(350, 770);
     int i,j;
 
@@ -123,13 +125,13 @@ void Board::draw() {
     players.push_back(player_green);
 
      //Set background to a dark color
-     this->setBackgroundBrush(Qt::darkCyan);
+     this->get_scene()->setBackgroundBrush(Qt::darkCyan);
 }
 
 void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move, QString images_path)
 {
      QPixmap images(images_path);
-     QGraphicsPixmapItem *pix = this->addPixmap(images);
+     QGraphicsPixmapItem *pix = this->get_scene()->addPixmap(images);
      pix->setPos(curr_pos.x, curr_pos.y);
      vec.push_back(new Pixel(pix));
 
@@ -137,8 +139,8 @@ void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move
      curr_pos.y += next_move.y;
 }
 
-int Board::play() {
-    int curr_player = turn;
+void Board::play(bool display_gui) {
+    //int curr_player = turn;
     //int play_next = players[turn]->move(die_rolls[die_index++], players, play_fields);
     int play_next = players[turn]->move(dice, players, play_fields);
     if(play_next) {
@@ -176,10 +178,7 @@ int Board::play() {
                 green_fields.at(i)->set_Pixmap(QPixmap(":/images/greenfinish.png"));
         }
 
-        QTimer::singleShot(50, [this] { play(); } );
+        if (display_gui) QTimer::singleShot(2, [&] { play(display_gui); } );
+        else play(display_gui);
     }
-    if (curr_player == turn) {
-        return 1;
-    }
-    return 0;
 }

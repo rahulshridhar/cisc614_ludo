@@ -8,11 +8,12 @@
 #include <Player.h>
 #include <QTimer>
 #include <QGraphicsView>
+#include <QApplication>
 
-class Board : public QGraphicsScene {
-    //Q_OBJECT
+class Board : public QObject {
+    Q_OBJECT
 private:
-    //QGraphicsScene* scene;
+    QGraphicsScene* scene;
     QGraphicsView* view;
     Dice* dice;
     QTimer* timer;
@@ -29,9 +30,11 @@ public:
     Board();
     ~Board();
     void draw();
-    int play();
+    void play(bool display_gui);
     void draw_pixel(std::vector<Pixel*>& vec, Node& curr_pos, Node next_move, QString img_path);
     int get_turn() { return turn; }
+    std::vector<Player*> get_players() { return players; }
+    QGraphicsScene* get_scene() { return scene; }
 
     const int pixel_size = 70;
 
@@ -62,6 +65,10 @@ public:
     int die_index = 0;
 signals:
     void exit();
+public slots:
+    void execute_exit() {
+        QApplication::instance()->quit();
+    };
 };
 
 #endif // BOARD_H
