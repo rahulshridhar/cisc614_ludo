@@ -18,6 +18,8 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*> playe
     pawn->get_current_pos()->set_Pixmap(QPixmap(":/images/border.png"));   //move current_pos to a play field
     pawn->get_current_pos()->remove_pawn();
 
+    moves++;
+
     while (die_roll) {
         //pawn->get_current_pos()->set_pawn(nullptr);
         int finish = pawn->move(play_fields, player_fields, finish_point);
@@ -49,7 +51,7 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*> playe
 //int Player::move(/*Dice* dice*/ int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
 int Player::move(Dice* dice, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     int die_roll = dice->roll();
-    qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
+    //qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
 
     auto player_strategy = get_strategy();
 
@@ -175,6 +177,7 @@ int Player::play_fast_move(int die_roll, std::vector<Player*> players, std::vect
                 start->set_pawn(p);
 
                 reset_opponent_piece(p, players, play_fields);
+                moves++;
             }
         }
     }
@@ -291,28 +294,28 @@ void Player::reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*> pla
             case 'b':
                 players.at(0)->pawns.at(base_location).p->set_current_pos(players.at(0)->player_fields.at(base_location));
                 players.at(0)->pawns.at(base_location).s = state::BASE;
-                players.at(0)->pawns.at(base_location).p->reset_moves();
+                players.at(0)->pawns.at(base_location).p->reset_passed_fields();
                 players.at(0)->player_fields.at(base_location)->set_pawn(curr_pawn);
                 players.at(0)->player_fields.at(base_location)->set_Pixmap(QPixmap(":/images/bluepawn.png"));
                 break;
             case 'r':
                 players.at(1)->pawns.at(base_location).p->set_current_pos(players.at(1)->player_fields.at(base_location));
                 players.at(1)->pawns.at(base_location).s = state::BASE;
-                players.at(1)->pawns.at(base_location).p->reset_moves();
+                players.at(1)->pawns.at(base_location).p->reset_passed_fields();
                 players.at(1)->player_fields.at(base_location)->set_pawn(curr_pawn);
                 players.at(1)->player_fields.at(base_location)->set_Pixmap(QPixmap(":/images/redpawn.png"));
                 break;
             case 'y':
                 players.at(2)->pawns.at(base_location).p->set_current_pos(players.at(2)->player_fields.at(base_location));
                 players.at(2)->pawns.at(base_location).s = state::BASE;
-                players.at(2)->pawns.at(base_location).p->reset_moves();
+                players.at(2)->pawns.at(base_location).p->reset_passed_fields();
                 players.at(2)->player_fields.at(base_location)->set_pawn(curr_pawn);
                 players.at(2)->player_fields.at(base_location)->set_Pixmap(QPixmap(":/images/yellowpawn.png"));
                 break;
             case 'g':
                 players.at(3)->pawns.at(base_location).p->set_current_pos(players.at(3)->player_fields.at(base_location));
                 players.at(3)->pawns.at(base_location).s = state::BASE;
-                players.at(3)->pawns.at(base_location).p->reset_moves();
+                players.at(3)->pawns.at(base_location).p->reset_passed_fields();
                 players.at(3)->player_fields.at(base_location)->set_pawn(curr_pawn);
                 players.at(3)->player_fields.at(base_location)->set_Pixmap(QPixmap(":/images/greenpawn.png"));
                 break;

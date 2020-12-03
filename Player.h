@@ -29,6 +29,7 @@ class Player {
     strategy st;
     int finish_point = 43;  //39 + 4 locations
     int finished_pawns = 0;
+    int moves = 0;
 public:
     std::string get_color() { return color; }
     Player(Pixel* start_point, std::vector<Pixel*> player_fields, std::string color, int start_pos, strategy st);
@@ -48,6 +49,7 @@ public:
     void set_pawn_on_field(Pawn* p);
     void reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*> players, std::vector<Pixel*> play_fields);
     int move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
+    int get_moves() { return moves; }
 };
 
 #endif // PLAYER_H
