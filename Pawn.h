@@ -8,7 +8,7 @@ class Pawn {
     Pixel* current_pos;
     std::string color;
     int base_location;
-    int moves = 0;
+    int passed_fields = 0;
 
 public:
     Pawn(Pixel* start_point, int start, std::string color, int location);
@@ -17,9 +17,9 @@ public:
     void set_current_pos(Pixel* p) { current_pos = p; }
     bool move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish);
     int get_base_location() { return base_location; }
-    void reset_moves() { moves = 0; }
-    void increment_move() { moves += 1; }
-    int get_moves() { return moves; }
+    void reset_passed_fields() { passed_fields = 0; }
+    void increment_passed_fields() { passed_fields += 1; }
+    int get_passed_fields() { return passed_fields; }
     int get_start() { return start; }
     ~Pawn();
 

@@ -6,15 +6,15 @@ Pawn::Pawn(Pixel* start_point, int start, std::string color, int location)
 Pawn::~Pawn() {}
 
 bool Pawn::move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish) {
-    moves++;
+    passed_fields++;
 
-    if (moves >= 40) {
-        current_pos = player_fields[4+(finish-moves)];
+    if (passed_fields >= 40) {
+        current_pos = player_fields[4+(finish-passed_fields)];
         finish--;
         return true;
     }
     else {
-        current_pos = play_fields[(start+moves)%40];
+        current_pos = play_fields[(start+passed_fields)%40];
     }
     return false;
 }
