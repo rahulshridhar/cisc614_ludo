@@ -10,7 +10,7 @@
 #include <QGraphicsView>
 #include <QApplication>
 
-class Board : public QObject {
+class Board : public QGraphicsScene {
     Q_OBJECT
 private:
     QGraphicsScene* scene;
@@ -27,14 +27,15 @@ private:
     int turn = 0;   //blue = 0, red = 1, yellow = 2, green = 3
 
 public:
-    Board();
-    ~Board();
+    Board(int game_num);
+    virtual ~Board();
     void draw();
     void play(bool display_gui);
     void draw_pixel(std::vector<Pixel*>& vec, Node& curr_pos, Node next_move, QString img_path);
     int get_turn() { return turn; }
     std::vector<Player*> get_players() { return players; }
     QGraphicsScene* get_scene() { return scene; }
+    int game_number = -1;
 
     const int pixel_size = 70;
 
@@ -63,12 +64,6 @@ public:
                                    3, 4, 6, 3, 6, 5, 3, 1, 3, 1, 4, 6, 1, 2, 5, 1, 1, 3, 5, 2, 6, 5, 5, 5, 5, 6, 2,
                                    5, 2, 3, 2, 5, 2};
     int die_index = 0;
-signals:
-    void exit();
-public slots:
-    void execute_exit() {
-        QApplication::instance()->quit();
-    };
 };
 
 #endif // BOARD_H

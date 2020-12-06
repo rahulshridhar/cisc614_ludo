@@ -3,8 +3,10 @@
 #include <QGraphicsPixmapItem>
 #include <iostream>
 #include <unistd.h>
+#include <thread>
+#include <chrono>
 
-Board::Board()
+Board::Board(int game_num) : game_number(game_num)
 {
     scene = new QGraphicsScene();
 
@@ -15,7 +17,7 @@ Board::Board()
     dice = new Dice();
 
     timer = new QTimer(this);
-    //connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000);
 }
 
@@ -73,7 +75,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::FAST);
+    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::FAST, game_number);
     //red was drawn
 
     current_pos.x = 700;
@@ -87,7 +89,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(yellow_fields, current_pos, directions[2], ":/images/yellowfinish.png");
 
-    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20, strategy::FAST);
+    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20, strategy::RANDOM, game_number);
     //yellow was drawn
 
     current_pos.x = 700;
@@ -100,7 +102,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(green_fields, current_pos, directions[3], ":/images/greenfinish.png");
 
-    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30, strategy::FAST);
+    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30, strategy::ATTACKING, game_number);
     //green was drawn
 
     current_pos.x = 70;
@@ -117,7 +119,7 @@ void Board::draw() {
     current_pos.x = 420;
     current_pos.y = 420;
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
-    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::FAST);
+    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::DEFENSIVE, game_number);
 
     players.push_back(player_blue);
     players.push_back(player_red);
@@ -142,20 +144,42 @@ void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move
 void Board::play(bool display_gui) {
     //int curr_player = turn;
     //int play_next = players[turn]->move(die_rolls[die_index++], players, play_fields);
-    int play_next = players[turn]->move(dice, players, play_fields);
+    bool play_next = players[turn]->move(dice, players, play_fields);
+
+    //if (turn == 0) std::cout<<"Blue moved " << players[turn]->get_moves() << std::endl;
+    //std::this_thread::sleep_for(std::chrono::microseconds(10));
+
     if(play_next) {
 
         turn++;
         if(turn == 4) turn = 0;
 
-        if(!(play_fields.at(0)->get_pawn()))
-            play_fields.at(0)->set_Pixmap(QPixmap(":/images/bluestart.png"));
-        if(!(play_fields.at(10)->get_pawn()))
-            play_fields.at(10)->set_Pixmap(QPixmap(":/images/redstart.png"));
-        if(!(play_fields.at(20)->get_pawn()))
-            play_fields.at(20)->set_Pixmap(QPixmap(":/images/yellowstart.png"));
-        if(!(play_fields.at(30)->get_pawn()))
-            play_fields.at(30)->set_Pixmap(QPixmap(":/images/greenstart.png"));
+        for (unsigned int i = 0; i < play_fields.size(); i++) {
+            Pawn* p = play_fields.at(i)->get_pawn();
+            if (!p) {
+                if (i == 0) play_fields.at(i)->set_Pixmap(QPixmap(":/images/bluestart.png"));
+                else if (i == 10) play_fields.at(i)->set_Pixmap(QPixmap(":/images/redstart.png"));
+                else if (i == 20) play_fields.at(i)->set_Pixmap(QPixmap(":/images/yellowstart.png"));
+                else if (i == 30) play_fields.at(i)->set_Pixmap(QPixmap(":/images/greenstart.png"));
+            }
+            else {
+                std::string color = p->get_color();
+                switch (color[0]) {
+                    case 'b':
+                        play_fields.at(i)->set_Pixmap(QPixmap(":/images/bluepawn.png"));
+                        break;
+                    case 'r':
+                        play_fields.at(i)->set_Pixmap(QPixmap(":/images/redpawn.png"));
+                        break;
+                    case 'y':
+                        play_fields.at(i)->set_Pixmap(QPixmap(":/images/yellowpawn.png"));
+                        break;
+                    case 'g':
+                        play_fields.at(i)->set_Pixmap(QPixmap(":/images/greenpawn.png"));
+                        break;
+                 }
+            }
+        }
 
         for (unsigned int i=4; i<blue_fields.size(); ++i) {
 
@@ -178,7 +202,7 @@ void Board::play(bool display_gui) {
                 green_fields.at(i)->set_Pixmap(QPixmap(":/images/greenfinish.png"));
         }
 
-        if (display_gui) QTimer::singleShot(2, [&] { play(display_gui); } );
+        if (display_gui) QTimer::singleShot(10, [this, display_gui] { play(display_gui); } );
         else play(display_gui);
     }
 }
