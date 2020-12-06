@@ -5,7 +5,7 @@ Pawn::Pawn(Pixel* start_point, int start, std::string color, int location)
 
 Pawn::~Pawn() {}
 
-bool Pawn::move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish) {
+bool Pawn::move(const std::vector<Pixel*>& play_fields, const std::vector<Pixel*>& player_fields, int& finish) {
     passed_fields++;
 
     if (passed_fields >= 40) {

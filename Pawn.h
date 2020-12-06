@@ -15,7 +15,7 @@ public:
     std::string get_color() { return color; }
     Pixel*& get_current_pos() { return current_pos; }
     void set_current_pos(Pixel* p) { current_pos = p; }
-    bool move(std::vector<Pixel*>& play_fields, std::vector<Pixel*>& player_fields, int& finish);
+    bool move(const std::vector<Pixel*>& play_fields, const std::vector<Pixel*>& player_fields, int& finish);
     int get_base_location() { return base_location; }
     void reset_passed_fields() { passed_fields = 0; }
     void increment_passed_fields() { passed_fields += 1; }
