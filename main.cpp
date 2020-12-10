@@ -29,22 +29,18 @@ int main(int argc, char *argv[])
 
         //blue = 0, red = 1, yellow = 2, green = 3
         if (board->get_turn() == 0) {
-            //std::cout<<"Blue wins!!!"<<std::endl;
             blue_wins++;
             blue_moves += board->get_players().at(0)->get_moves();
         }
         else if (board->get_turn() == 1) {
-            //std::cout<<"Red wins!!!"<<std::endl;
             red_wins++;
             red_moves += board->get_players().at(1)->get_moves();
         }
         else if (board->get_turn() == 2) {
-            //std::cout<<"Yellow wins!!!"<<std::endl;
             yellow_wins++;
             yellow_moves += board->get_players().at(2)->get_moves();
         }
         else if (board->get_turn() == 3) {
-            //std::cout<<"Green wins!!!"<<std::endl;
             green_wins++;
             green_moves += board->get_players().at(3)->get_moves();
         }
