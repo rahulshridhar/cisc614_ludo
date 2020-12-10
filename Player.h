@@ -6,8 +6,10 @@
 #include <Pixel.h>
 #include <random>
 
+//! Holds the states of the pawns
 enum state { BASE, INFLIGHT, FINISHED };
 
+//! Enum storing the different player strategies
 enum strategy {
     FAST,
     RANDOM,
