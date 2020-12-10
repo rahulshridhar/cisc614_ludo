@@ -1,6 +1,7 @@
 #include <Player.h>
 #include <QDebug>
 #include <iostream>
+#include <Common.h>
 
 Player::Player(Pixel* start_point, std::vector<Pixel*> player_fields, std::string color, int start_pos, strategy st, int game_num):
     start(start_point), player_fields(player_fields), color(color), st(st), game_number(game_num)
@@ -86,7 +87,7 @@ void Player::move_base_pawn(Pawn* p, std::vector<Player*>& players) {
 //int Player::move(/*Dice* dice*/ int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
 int Player::move(Dice* dice, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     int die_roll = dice->roll();
-    //qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
+    if (debug) qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
 
     auto player_strategy = get_strategy();
 

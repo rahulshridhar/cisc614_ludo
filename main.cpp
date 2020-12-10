@@ -3,12 +3,14 @@
 #include <iostream>
 #include <QObject>
 #include <unistd.h>
+#include <Common.h>
 
 bool display_gui = false;
+bool debug = false;
 
 int main(int argc, char *argv[])
 {
-    int total_games = 10;
+    int total_games = 1;
     int blue_wins = 0, blue_moves = 0;
     int red_wins = 0, red_moves = 0;
     int yellow_wins = 0, yellow_moves = 0;
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
     int avg_yellow_moves = yellow_moves ? yellow_moves/yellow_wins : 0;
     int avg_green_moves = green_moves ? green_moves/green_wins : 0;
 
-    std::cout << "Total games = " << total_games << " " << blue_wins + red_wins + yellow_wins + green_wins << std::endl;
+    std::cout << "Total games = " << total_games << std::endl;
     std::cout << "Blue %-win = " << blue_win_pc << " Average moves = " << avg_blue_moves << std::endl;
     std::cout << "Red %-win = " << red_win_pc << " Average moves = " << avg_red_moves << std::endl;
     std::cout << "Yellow %-win = " << yellow_win_pc << " Average moves = " << avg_yellow_moves << std::endl;

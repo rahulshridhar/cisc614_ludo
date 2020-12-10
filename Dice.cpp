@@ -1,5 +1,4 @@
 #include "Dice.h"
-#include "Common.h"
 #include <random>
 
 int Dice::roll()

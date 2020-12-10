@@ -5,7 +5,6 @@
 #include <Dice.h>
 #include <Pixel.h>
 #include <random>
-#include <Common.h>
 
 enum state { BASE, INFLIGHT, FINISHED };
 
