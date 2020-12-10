@@ -5,12 +5,13 @@
 #include <unistd.h>
 #include <Common.h>
 
-bool display_gui = false;
-bool debug = false;
+bool display_gui = true;
+bool debug = true;
+int total_games = 1;
+int sim_time_in_ms = 10;
 
 int main(int argc, char *argv[])
 {
-    int total_games = 1;
     int blue_wins = 0, blue_moves = 0;
     int red_wins = 0, red_moves = 0;
     int yellow_wins = 0, yellow_moves = 0;
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
         delete board;
     }
 
-    assert(blue_wins + red_wins + yellow_wins + green_moves != total_games);
+    //assert(blue_wins + red_wins + yellow_wins + green_moves != total_games);
 
     // Compute win percentages and average moves taken during a player's win
     double blue_win_pc = (double)blue_wins*100/total_games;

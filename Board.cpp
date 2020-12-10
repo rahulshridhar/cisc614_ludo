@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <thread>
 #include <chrono>
+#include <Common.h>
 
 Board::Board(int game_num) : game_number(game_num)
 {
@@ -75,7 +76,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::FAST, game_number);
+    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::DEFENSIVE, game_number);
     //red was drawn
 
     current_pos.x = 700;
@@ -102,7 +103,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(green_fields, current_pos, directions[3], ":/images/greenfinish.png");
 
-    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30, strategy::ATTACKING, game_number);
+    Player *player_green = new Player(play_fields.at(30), green_fields, "green", 30, strategy::FAST, game_number);
     //green was drawn
 
     current_pos.x = 70;
@@ -119,7 +120,7 @@ void Board::draw() {
     current_pos.x = 420;
     current_pos.y = 420;
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
-    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::DEFENSIVE, game_number);
+    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::ATTACKING, game_number);
 
     players.push_back(player_blue);
     players.push_back(player_red);
@@ -202,7 +203,7 @@ void Board::play(bool display_gui) {
                 green_fields.at(i)->set_Pixmap(QPixmap(":/images/greenfinish.png"));
         }
 
-        if (display_gui) QTimer::singleShot(10, [this, display_gui] { play(display_gui); } );
+        if (display_gui) QTimer::singleShot(sim_time_in_ms, [this, display_gui] { play(display_gui); } );
         else play(display_gui);
     }
 }
