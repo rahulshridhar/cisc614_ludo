@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         delete board;
     }
 
-    //assert(blue_wins + red_wins + yellow_wins + green_moves == total_games);
+    assert(blue_wins + red_wins + yellow_wins + green_moves != total_games);
 
     // Compute win percentages and average moves taken during a player's win
     double blue_win_pc = (double)blue_wins*100/total_games;
