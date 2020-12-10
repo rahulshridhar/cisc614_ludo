@@ -169,28 +169,29 @@ bool Player::is_attack_possible(Pawn *p, state s, int die_roll, std::vector<Pixe
 
     Pixel* pixel_attacking_pos = play_fields.at(attacking_pos);
 
-    //has_more_than_one pawn has a possibility of killing a single opponent pawn even if it is colocated with friendly pawn - may handle later
-    if (pixel_attacking_pos->get_curr_pawns().size() > 1) {
-        std::cout<<"Yikes!!"<<std::endl;
-        std::cout<<"Curr player ->" << p->get_color() << std::endl;
-        for (const auto& pawn : pixel_attacking_pos->get_curr_pawns()) {
-            std::cout << pawn->get_color() << std::endl;
+    if (pixel_attacking_pos->is_empty()) return false;
+
+    const std::vector<Pawn*>& all_pawns = pixel_attacking_pos->get_curr_pawns();
+    //has_more_than_one pawn has a possibility of killing a single opponent pawn even if it is colocated with friendly pawn
+    if (all_pawns.size() > 1) {
+        int enemy_pawn = 0;
+        for (const auto& pawn : all_pawns) {
+            if (pawn->get_color() != p->get_color()) enemy_pawn++;
         }
+        if (enemy_pawn > 1) return false;
     }
-    if (pixel_attacking_pos->is_empty() || pixel_attacking_pos->has_more_than_one_pawn()) return false;
+    else {      //if only one pawn
+        Pawn* pawn_attacking_pos = pixel_attacking_pos->get_pawn();
 
-    Pawn* pawn_attacking_pos = pixel_attacking_pos->get_pawn();
-
-    //return false if it is a friendly pawn
-    if (pawn_attacking_pos->get_color() == p->get_color()) return false;
+        //return false if it is a friendly pawn
+        if (pawn_attacking_pos->get_color() == p->get_color()) return false;
+    }
 
     return true;
 }
 
 int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     bool can_attack = false;
-
-    //if (!has_pawn_on_board()) return play_random_move(die_roll, players, play_fields); -- does not solve the attack possible by a base pawn on a 6
 
     std::vector<int> available_pawns;
     // find all pawns on board, find any one that can attack an opponent pawn
@@ -355,8 +356,19 @@ void Player::set_pawn_on_field(Pawn* p) {
 // Need attacking pawn to get the field's current pawn
 void Player::reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*>& players) {
     auto curr_pixel = attacking_pawn->get_current_pos();
-    Pawn* curr_pawn = curr_pixel->get_pawn();
-    if (!curr_pawn || curr_pixel->has_more_than_one_pawn()) return;
+    if (curr_pixel->is_empty()) return;
+
+    const std::vector<Pawn*>& all_pawns = curr_pixel->get_curr_pawns();
+    //has_more_than_one pawn has a possibility of killing a single opponent pawn even if it is colocated with friendly pawn
+    Pawn *curr_pawn = nullptr;
+    int enemy_pawns = 0;
+    for (const auto& pawn : all_pawns) {
+        if (pawn->get_color() != attacking_pawn->get_color()) {
+            curr_pawn = pawn;
+            enemy_pawns++;
+        }
+    }
+    if (enemy_pawns > 1) return;
 
     if (curr_pawn && attacking_pawn->get_color() != curr_pawn->get_color()) {
         curr_pixel->remove_pawn(curr_pawn);
