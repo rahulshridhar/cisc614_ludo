@@ -122,6 +122,7 @@ void Board::draw() {
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
     Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::ATTACKING, game_number);
 
+    // Store the individual players
     players.push_back(player_blue);
     players.push_back(player_red);
     players.push_back(player_yellow);
@@ -131,6 +132,7 @@ void Board::draw() {
      this->get_scene()->setBackgroundBrush(Qt::darkCyan);
 }
 
+//! Generic helper function that draws the pixel on the ludo board and moves the location appropriately
 void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move, QString images_path)
 {
      QPixmap images(images_path);
@@ -142,16 +144,11 @@ void Board::draw_pixel(std::vector<Pixel *> &vec, Node &curr_pos, Node next_move
      curr_pos.y += next_move.y;
 }
 
+//! Function that handles player moves - keeps executing until the game is completed
 void Board::play(bool display_gui) {
-    //int curr_player = turn;
-    //int play_next = players[turn]->move(die_rolls[die_index++], players, play_fields);
     bool play_next = players[turn]->move(dice, players, play_fields);
 
-    //if (turn == 0) std::cout<<"Blue moved " << players[turn]->get_moves() << std::endl;
-    //std::this_thread::sleep_for(std::chrono::microseconds(10));
-
     if(play_next) {
-
         turn++;
         if(turn == 4) turn = 0;
 

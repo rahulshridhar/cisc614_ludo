@@ -5,9 +5,9 @@
 
 class Pawn {
     int start;
-    Pixel* current_pos;
+    Pixel* current_pos;    //Location of the pawn on the board
     std::string color;
-    int base_location;
+    int base_location;     //origin location of the pawn
     int passed_fields = 0;
 
 public:

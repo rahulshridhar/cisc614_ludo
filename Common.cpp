@@ -1,6 +1,7 @@
 #include <Common.h>
 #include <random>
 
+//! Picks a random index between start and end
 int pick_random_index(int start, int end)
 {
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
