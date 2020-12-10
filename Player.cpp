@@ -15,6 +15,8 @@ Player::~Player() {
     for (int i = 0; i < 4; i++) delete pawns[i].p;
 }
 
+//! Given a pawn, this moves the pawn by die_roll number of squares on the board
+//! Also checks if game is finished
 int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*>& players, const std::vector<Pixel*>& play_fields) {
     int base_loc = pawn->get_base_location();
     pawn->get_current_pos()->set_Pixmap(QPixmap(":/images/border.png"));   //move current_pos to a play field
@@ -48,6 +50,7 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*>& play
     return 1;
 }
 
+//! Moves the pawn from base when a 6 is rolled
 void Player::move_base_pawn(Pawn* p, std::vector<Player*>& players) {
     int base_loc = p->get_base_location();
     pawns.at(base_loc).s = state::INFLIGHT;
@@ -84,7 +87,7 @@ void Player::move_base_pawn(Pawn* p, std::vector<Player*>& players) {
     reset_opponent_piece(p, players);
 }
 
-//int Player::move(/*Dice* dice*/ int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
+//! Starting point for a player move -> Player move depends on the strategy of the player
 int Player::move(Dice* dice, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     int die_roll = dice->roll();
     if (debug) qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
@@ -103,6 +106,7 @@ int Player::move(Dice* dice, std::vector<Player*> players, std::vector<Pixel*> p
     }
 }
 
+//! Function for a random move by a player
 int Player::play_random_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     std::vector<int> available_pawns;
     // find all pawns on board, pick a random index, move that pawn forward
@@ -119,6 +123,7 @@ int Player::play_random_move(int die_roll, std::vector<Player*> players, std::ve
     int num_pawns = available_pawns.size();
     if (!num_pawns) return 1;
 
+    //pick a random index between the available pawns
     int random_index = pick_random_index(0, num_pawns-1);
     auto& pawn = pawns.at(available_pawns[random_index]).p;
     auto pawn_state = pawns.at(available_pawns[random_index]).s;
@@ -138,13 +143,16 @@ int Player::play_random_move(int die_roll, std::vector<Player*> players, std::ve
     return 1;
 }
 
+//! Function to play a fast move by a player
 int Player::play_fast_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
+    //Checks if pawn is present on board
     if (has_pawn_on_board()) {
         Pawn* p = get_pawn_on_board();
         assert(p);
         moves++;
         return move_board_pawn(p, die_roll, players, play_fields);
     }
+    //If no pawn on board, has the player rolled a 6 -> Only this can move a pawn from base to the start
     else {
         if(die_roll == 6) {
             if (is_pawn_at_base()) {
@@ -156,6 +164,7 @@ int Player::play_fast_move(int die_roll, std::vector<Player*> players, std::vect
     return 1;
 }
 
+//! Checks if the given pawn can launch an attack on an opponent -> Returns a boolean
 bool Player::is_attack_possible(Pawn *p, state s, int die_roll, std::vector<Pixel*> play_fields) {
     if (!p || s == state::FINISHED) return false;
 
@@ -191,6 +200,7 @@ bool Player::is_attack_possible(Pawn *p, state s, int die_roll, std::vector<Pixe
     return true;
 }
 
+//! Function that launches an attacking move by a player
 int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     bool can_attack = false;
 
@@ -209,6 +219,7 @@ int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std:
     int num_pawns = available_pawns.size();
     if (!num_pawns) return play_random_move(die_roll, players, play_fields);
 
+    //Check if any available pawn can launch an attack - just picks the first pawn that can perform an attack
     for (unsigned int i = 0; i < available_pawns.size(); i++) {
         int base_loc = available_pawns[i];
         Pawn* p = pawns.at(base_loc).p;
@@ -234,6 +245,7 @@ int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std:
     return play_random_move(die_roll, players, play_fields);
 }
 
+//! Checks if the given pawn can defend an attack from an opponent -> Returns a boolean
 bool Player::is_defense_possible(Pawn *p, state s, int die_roll, const std::vector<Pixel*>& play_fields) {
     if (!p || s == state::FINISHED || s == state::BASE) return false;
 
@@ -256,6 +268,7 @@ bool Player::is_defense_possible(Pawn *p, state s, int die_roll, const std::vect
     return true;
 }
 
+//! Function that launches a defensive move by a player
 int Player::play_defensive_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     // find all pawns on board, find any one that can be defended
     // only board pawns need to be defended
@@ -265,6 +278,7 @@ int Player::play_defensive_move(int die_roll, std::vector<Player*> players, std:
 
     bool can_defend = false;
 
+    // Check first available pawn that can defend itself
     for (unsigned int i = 0; i < available_pawns.size(); i++) {
         int base_loc = available_pawns[i];
         Pawn* p = pawns.at(base_loc).p;
@@ -285,6 +299,7 @@ int Player::play_defensive_move(int die_roll, std::vector<Player*> players, std:
     return play_random_move(die_roll, players, play_fields);
 }
 
+//! Returns the first available pawn on board
 Pawn* Player::get_pawn_on_board() {
     for (int i = 0; i < 4; i++) {
         if (pawns[i].s == state::INFLIGHT) return pawns[i].p;
@@ -292,6 +307,7 @@ Pawn* Player::get_pawn_on_board() {
     return nullptr;
 }
 
+//! Returns true or false based on whether a pawn is available on the board
 bool Player::has_pawn_on_board() {
     for (int i = 0; i < 4; i++) {
         if (pawns[i].s == state::INFLIGHT) return true;
@@ -299,6 +315,7 @@ bool Player::has_pawn_on_board() {
     return false;
 }
 
+//! Checks if pawn is available at base
 bool Player::is_pawn_at_base() {
     for (int i = 0; i < 4; i++) {
         if (pawns[i].s == state::BASE) return true;
@@ -306,6 +323,7 @@ bool Player::is_pawn_at_base() {
     return false;
 }
 
+//! Returns the first available pawn at base
 Pawn* Player::get_pawn_at_base() {
     for (int i = 0; i < 4; i++) {
         if (pawns[i].s == state::BASE) return pawns[i].p;
@@ -313,6 +331,7 @@ Pawn* Player::get_pawn_at_base() {
     return nullptr;
 }
 
+//! Returns the base location of the first available pawn at base
 int Player::get_pawn_index_at_base() {
     for (int i = 0; i < 4; i++) {
         if (pawns[i].s == state::BASE) return i;
@@ -320,6 +339,7 @@ int Player::get_pawn_index_at_base() {
     assert(false);
 }
 
+//! Returns the list of all active pawns on the board
 std::vector<int> Player::get_active_pawns() {
     std::vector<int> ret;
     for (int i = 0; i < 4; i++) {
@@ -328,6 +348,7 @@ std::vector<int> Player::get_active_pawns() {
     return ret;
 }
 
+//! Returns a list of base locations of all the base and inflight pawns
 std::vector<int> Player::get_base_and_board_pawns() {
     std::vector<int> ret;
     for (int i = 0; i < 4; i++) {
@@ -336,6 +357,7 @@ std::vector<int> Player::get_base_and_board_pawns() {
     return ret;
 }
 
+//! Sets the pixel on the field based on the color of the pawn
 void Player::set_pawn_on_field(Pawn* p) {
     std::string color = p->get_color();
     switch (color[0]) {
@@ -354,7 +376,7 @@ void Player::set_pawn_on_field(Pawn* p) {
     }
 }
 
-// Need attacking pawn to get the field's current pawn
+//! Function that resets an opponent's piece if it can be attacked by the attacking_pawn
 void Player::reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*>& players) {
     auto curr_pixel = attacking_pawn->get_current_pos();
     if (curr_pixel->is_empty()) return;
