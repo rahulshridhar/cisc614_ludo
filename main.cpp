@@ -6,9 +6,10 @@
 #include <Common.h>
 
 bool display_gui = true;
-bool debug = true;
+bool debug = false;
 int total_games = 1;
 int sim_time_in_ms = 10;
+bool play_teams = true;
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +20,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     for (int i = 0; i < total_games; i++) {
-        Board *board = new Board(i+1);
+        Board *board = new Board(i+1, play_teams);
 
         board->get_scene()->setSceneRect(0, 0, 1000, 900);
         board->draw();
@@ -48,21 +49,36 @@ int main(int argc, char *argv[])
         delete board;
     }
 
-    // Compute win percentages and average moves taken during a player's win
-    double blue_win_pc = (double)blue_wins*100/total_games;
-    double red_win_pc = (double)red_wins*100/total_games;
-    double yellow_win_pc = (double)yellow_wins*100/total_games;
-    double green_win_pc = (double)green_wins*100/total_games;
-    int avg_blue_moves = blue_moves ? blue_moves/blue_wins : 0;
-    int avg_red_moves = red_moves ? red_moves/red_wins : 0;
-    int avg_yellow_moves = yellow_moves ? yellow_moves/yellow_wins : 0;
-    int avg_green_moves = green_moves ? green_moves/green_wins : 0;
+    if (play_teams) {
+        int team1_wins = blue_wins + yellow_wins;
+        int team2_wins = red_wins + green_wins;
+        int team1_moves = blue_moves + yellow_moves;
+        int team2_moves = red_moves + green_moves;
 
-    std::cout << "Total games = " << total_games << std::endl;
-    std::cout << "Blue %-win = " << blue_win_pc << " Average moves = " << avg_blue_moves << std::endl;
-    std::cout << "Red %-win = " << red_win_pc << " Average moves = " << avg_red_moves << std::endl;
-    std::cout << "Yellow %-win = " << yellow_win_pc << " Average moves = " << avg_yellow_moves << std::endl;
-    std::cout << "Green %-win = " << green_win_pc << " Average moves = " << avg_green_moves << std::endl;
+        double team1_win_pc = (double)team1_wins*100/total_games;
+        double team2_win_pc = (double)team2_wins*100/total_games;
+        int team1_avg_moves = team1_moves ? team1_moves/team1_wins : 0;
+        int team2_avg_moves = team2_moves ? team2_moves/team2_wins : 0;
 
+        std::cout << "Total games = " << total_games << std::endl;
+        std::cout << "Team1 %-win of blue and yellow player = " << team1_win_pc << " Average moves = " << team1_avg_moves << std::endl;
+        std::cout << "Team2 %-win of red and green player = " << team2_win_pc << " Average moves = " << team2_avg_moves << std::endl;
+    } else {
+        // Compute win percentages and average moves taken during a player's win
+        double blue_win_pc = (double)blue_wins*100/total_games;
+        double red_win_pc = (double)red_wins*100/total_games;
+        double yellow_win_pc = (double)yellow_wins*100/total_games;
+        double green_win_pc = (double)green_wins*100/total_games;
+        int avg_blue_moves = blue_moves ? blue_moves/blue_wins : 0;
+        int avg_red_moves = red_moves ? red_moves/red_wins : 0;
+        int avg_yellow_moves = yellow_moves ? yellow_moves/yellow_wins : 0;
+        int avg_green_moves = green_moves ? green_moves/green_wins : 0;
+
+        std::cout << "Total games = " << total_games << std::endl;
+        std::cout << "Blue %-win = " << blue_win_pc << " Average moves = " << avg_blue_moves << std::endl;
+        std::cout << "Red %-win = " << red_win_pc << " Average moves = " << avg_red_moves << std::endl;
+        std::cout << "Yellow %-win = " << yellow_win_pc << " Average moves = " << avg_yellow_moves << std::endl;
+        std::cout << "Green %-win = " << green_win_pc << " Average moves = " << avg_green_moves << std::endl;
+    }
     return a.exec();
 }

@@ -25,9 +25,10 @@ private:
     std::vector<Pixel*> center_field;
     std::vector<Player*> players;
     int turn = 0;   //blue = 0, red = 1, yellow = 2, green = 3
+    bool team_play;
 
 public:
-    Board(int game_num);
+    Board(int game_num, bool team_play);
     virtual ~Board();
     void draw();
     void play(bool display_gui);

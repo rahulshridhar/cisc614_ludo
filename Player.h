@@ -14,7 +14,8 @@ enum strategy {
     FAST,
     RANDOM,
     ATTACKING,
-    DEFENSIVE
+    DEFENSIVE,
+    MIXED
 };
 
 class Player {
@@ -31,6 +32,8 @@ class Player {
     int finish_point = 43;  //39 + 4 locations
     int finished_pawns = 0;
     int moves = 0;
+    Player* team_mate = nullptr;
+    bool is_helper = false;
 public:
     std::string get_color() { return color; }
     Player(Pixel* start_point, std::vector<Pixel*> player_fields, std::string color, int start_pos, strategy st, int game_num);
@@ -45,8 +48,12 @@ public:
     strategy get_strategy() { return st; }
     int play_random_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
     int play_fast_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
+    bool can_play_fast_move(int die_roll);
     int play_attacking_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
+    bool can_play_attacking_move(int die_roll, std::vector<Pixel*> play_fields);
     int play_defensive_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
+    bool can_play_defensive_move(int die_roll, std::vector<Pixel*> play_fields);
+    int play_mixed_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
     std::vector<int> get_active_pawns();
     std::vector<int> get_base_and_board_pawns();
     void set_pawn_on_field(Pawn* p);
@@ -56,6 +63,12 @@ public:
     int get_moves() { return moves; }
     bool is_attack_possible(Pawn *p, state s, int die_roll, std::vector<Pixel*> play_fields);
     bool is_defense_possible(Pawn *p, state s, int die_roll, const std::vector<Pixel*>& play_fields);
+    void set_teammate(Player* mate) { team_mate = mate; }
+    Player* get_teammate() { return team_mate; }
+    int get_finished_pawns() { return finished_pawns; }
+    std::vector<pawns_state> get_pawns() { return pawns; }
+    void increment_finished_pawns() { finished_pawns++; }
+    int play_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields);
     int game_number = -1;
 };
 

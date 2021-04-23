@@ -7,7 +7,7 @@
 #include <chrono>
 #include <Common.h>
 
-Board::Board(int game_num) : game_number(game_num)
+Board::Board(int game_num, bool team_play) : team_play(team_play), game_number(game_num)
 {
     scene = new QGraphicsScene();
 
@@ -76,7 +76,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(red_fields, current_pos, directions[1], ":/images/redfinish.png");
 
-    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::DEFENSIVE, game_number);
+    Player *player_red = new Player(play_fields.at(10), red_fields, "red", 10, strategy::ATTACKING, game_number);
     //red was drawn
 
     current_pos.x = 700;
@@ -90,7 +90,7 @@ void Board::draw() {
     for(j=0; j<4; ++j)
         draw_pixel(yellow_fields, current_pos, directions[2], ":/images/yellowfinish.png");
 
-    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20, strategy::RANDOM, game_number);
+    Player *player_yellow = new Player(play_fields.at(20), yellow_fields, "yellow", 20, strategy::DEFENSIVE, game_number);
     //yellow was drawn
 
     current_pos.x = 700;
@@ -120,13 +120,20 @@ void Board::draw() {
     current_pos.x = 420;
     current_pos.y = 420;
     draw_pixel(center_field, current_pos, Node(0, 0), ":/images/all.png");
-    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::ATTACKING, game_number);
+    Player *player_blue = new Player(play_fields.at(0), blue_fields, "blue", 0, strategy::MIXED, game_number);
 
     // Store the individual players
     players.push_back(player_blue);
     players.push_back(player_red);
     players.push_back(player_yellow);
     players.push_back(player_green);
+
+    if (team_play) {
+        player_blue->set_teammate(player_yellow);
+        player_yellow->set_teammate(player_blue);
+        player_red->set_teammate(player_green);
+        player_green->set_teammate(player_red);
+    }
 
      //Set background to a dark color
      this->get_scene()->setBackgroundBrush(Qt::darkCyan);

@@ -22,6 +22,8 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*>& play
     pawn->get_current_pos()->set_Pixmap(QPixmap(":/images/border.png"));   //move current_pos to a play field
     pawn->get_current_pos()->remove_pawn(pawn);
 
+    Player* mate = get_teammate();
+
     while (die_roll) {
         //pawn->get_current_pos()->set_pawn(nullptr);
         int finish = pawn->move(play_fields, player_fields, finish_point);
@@ -33,7 +35,18 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*>& play
         }
 
         if (finish) {
-            finished_pawns++;
+            if (pawn->get_color() == get_color()) {
+                increment_finished_pawns();
+                if (debug) std::cout << "Player " << get_color() << "'s finished pawns is incremented to " << get_finished_pawns() << std::endl;
+            }
+            else {
+                assert(false);                                 //never need to increment teammate's pawn
+                mate->increment_finished_pawns();              //increment teammate's finished pawns
+                if (debug) {
+                    std::cout << "Player " << get_color() << "'s teammate " << mate->get_color() << "'s finished pawns is incremented to "
+                              << mate->get_finished_pawns() << std::endl;
+                }
+            }
             set_pawn_on_field(pawn);
             pawns.at(base_loc).s = state::FINISHED;
             if (die_roll > 1) pawn->get_current_pos()->set_pawn(pawn);
@@ -44,8 +57,21 @@ int Player::move_board_pawn(Pawn* pawn, int die_roll, std::vector<Player*>& play
     }
 
     if (finished_pawns == 4) {
-        qInfo() << "Game No." << game_number << " -> " << color.c_str() << "player wins!";
-        return 0;
+        Player* mate = get_teammate();
+        if (mate) {
+            if(mate->get_finished_pawns() == 4) {
+                qInfo() << "Game No." << game_number << " -> Team " << color.c_str() << " and " << mate->get_color().c_str() << " win!";
+                return 0;
+            }
+            else {
+                if (is_helper) assert(false);
+                if (debug) std::cout << get_color() <<"Assigning player " << get_color() << " as helper of the team"
+                                     << std::endl;
+                is_helper = true;
+                return 1;
+            }
+        }
+        else { qInfo() << "Game No." << game_number << " -> " << color.c_str() << "player wins!"; return 0; }
     }
     return 1;
 }
@@ -90,20 +116,44 @@ void Player::move_base_pawn(Pawn* p, std::vector<Player*>& players) {
 //! Starting point for a player move -> Player move depends on the strategy of the player
 int Player::move(Dice* dice, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     int die_roll = dice->roll();
-    if (debug) qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
+    //if (debug) qInfo() << "Player" << color.c_str() << "rolled" << die_roll;
 
+    if (finished_pawns == 4) {
+        Player* mate = get_teammate();
+        if (mate) return mate->play_move(die_roll, players, play_fields);
+        else { assert(false); return 1; }             //If current player finished playing and has no teammate - this should never happen
+    }
+    return play_move(die_roll, players, play_fields);
+}
+
+int Player::play_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     auto player_strategy = get_strategy();
 
     switch (player_strategy) {
         case strategy::FAST:
-            return play_fast_move(die_roll, players, play_fields);
+        {
+            if (can_play_fast_move(die_roll)) return play_fast_move(die_roll, players, play_fields);
+            else return play_random_move(die_roll, players, play_fields);
+        }
         case strategy::RANDOM:
             return play_random_move(die_roll, players, play_fields);
         case strategy::ATTACKING:
-            return play_attacking_move(die_roll, players, play_fields);
+        {
+            if (can_play_attacking_move(die_roll, play_fields)) return play_attacking_move(die_roll, players, play_fields);
+            else return play_random_move(die_roll, players, play_fields);
+        }
         case strategy::DEFENSIVE:
-            return play_defensive_move(die_roll, players, play_fields);
+        {
+            if (can_play_defensive_move(die_roll, play_fields)) return play_defensive_move(die_roll, players, play_fields);
+            else return play_random_move(die_roll, players, play_fields);
+        }
+        case strategy::MIXED:
+        {
+            return play_mixed_move(die_roll, players, play_fields);
+        }
+        default: assert(false);
     }
+    return 0;
 }
 
 //! Function for a random move by a player
@@ -141,6 +191,15 @@ int Player::play_random_move(int die_roll, std::vector<Player*> players, std::ve
         assert(false);
     }
     return 1;
+}
+
+//! Function to check if player can play a fast move
+bool Player::can_play_fast_move(int die_roll) {
+    //Checks if pawn is present on board
+    if (has_pawn_on_board()) return true;
+    //If no pawn on board, has the player rolled a 6 -> Only this can move a pawn from base to the start
+    else if(die_roll == 6 && is_pawn_at_base()) return true;
+    return false;
 }
 
 //! Function to play a fast move by a player
@@ -181,23 +240,63 @@ bool Player::is_attack_possible(Pawn *p, state s, int die_roll, std::vector<Pixe
 
     if (pixel_attacking_pos->is_empty()) return false;
 
+    Player* mate = get_teammate();
+
     const std::vector<Pawn*>& all_pawns = pixel_attacking_pos->get_curr_pawns();
     //has_more_than_one pawn has a possibility of killing a single opponent pawn even if it is colocated with friendly pawn
     if (all_pawns.size() > 1) {
         int enemy_pawn = 0;
         for (const auto& pawn : all_pawns) {
-            if (pawn->get_color() != p->get_color()) enemy_pawn++;
+            if (pawn->get_color() == p->get_color()) continue;              //continue if pawn is friendly pawn
+            if (mate && pawn->get_color() == mate->get_color()) continue;   //continue if pawn is a teammate
+            enemy_pawn++;
         }
         if (enemy_pawn > 1) return false;
     }
     else {      //if only one pawn
         Pawn* pawn_attacking_pos = pixel_attacking_pos->get_pawn();
 
+        std::string opponent_color = pawn_attacking_pos->get_color();
+
         //return false if it is a friendly pawn
-        if (pawn_attacking_pos->get_color() == p->get_color()) return false;
+        if (opponent_color == p->get_color()) return false;
+
+        //Check if opponent pawn is a teammate
+        if (mate && mate->get_color() == opponent_color) return false;
     }
 
     return true;
+}
+
+//! Function that checks if an attacking move can be made by a player
+bool Player::can_play_attacking_move(int die_roll, std::vector<Pixel*> play_fields) {
+    bool can_attack = false;
+
+    std::vector<int> available_pawns;
+    // find all pawns on board, find any one that can attack an opponent pawn
+
+    //if die roll is 6, check between base and board pawns
+    if (die_roll == 6) available_pawns = get_base_and_board_pawns();
+    //if die roll is not 6, check between board pawns
+    else available_pawns = get_active_pawns();
+
+    int num_pawns = available_pawns.size();
+    if (!num_pawns) return false;
+
+    //Check if any available pawn can launch an attack - just picks the first pawn that can perform an attack
+    for (int i = 0; i < num_pawns; i++) {
+        int base_loc = available_pawns[i];
+        Pawn* p = pawns.at(base_loc).p;
+        state s = pawns.at(base_loc).s;
+        can_attack = is_attack_possible(p, s, die_roll, play_fields);
+        if (can_attack) {
+            if (s == state::BASE || s == state::INFLIGHT) return true;
+            else assert(false);
+        }
+    }
+
+    // if no attack possible, return false
+    return false;
 }
 
 //! Function that launches an attacking move by a player
@@ -217,10 +316,10 @@ int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std:
     }
 
     int num_pawns = available_pawns.size();
-    if (!num_pawns) return play_random_move(die_roll, players, play_fields);
+    if (!num_pawns) assert(false);
 
     //Check if any available pawn can launch an attack - just picks the first pawn that can perform an attack
-    for (unsigned int i = 0; i < available_pawns.size(); i++) {
+    for (int i = 0; i < num_pawns; i++) {
         int base_loc = available_pawns[i];
         Pawn* p = pawns.at(base_loc).p;
         state s = pawns.at(base_loc).s;
@@ -241,6 +340,7 @@ int Player::play_attacking_move(int die_roll, std::vector<Player*> players, std:
         }
     }
 
+    assert(false);
     // if no attack possible, play a random piece
     return play_random_move(die_roll, players, play_fields);
 }
@@ -250,6 +350,8 @@ bool Player::is_defense_possible(Pawn *p, state s, int die_roll, const std::vect
     if (!p || s == state::FINISHED || s == state::BASE) return false;
 
     int defensive_pos = (p->get_passed_fields() + p->get_start() + die_roll) % 40;
+
+    Player* mate = get_teammate();
 
     // Check if moving to this defensive position allows this pawn to be defended
     // This translates to checking if (pos-1 to pos-6 have no pawns on it)
@@ -261,20 +363,49 @@ bool Player::is_defense_possible(Pawn *p, state s, int die_roll, const std::vect
         if (pixel_behind->is_empty()) continue;
         const std::vector<Pawn*> pawns = pixel_behind->get_curr_pawns();
         for (const auto& pawn: pawns) {
-            if (pawn->get_color() != p->get_color()) return false;
+            if (pawn->get_color() == p->get_color()) continue;
+            if (mate && mate->get_color() == pawn->get_color()) continue;
+            return false;
         }
     }
 
     return true;
 }
 
-//! Function that launches a defensive move by a player
+//! Function that checks if a defensive move can be made by a player
+bool Player::can_play_defensive_move(int die_roll, std::vector<Pixel*> play_fields) {
+    // find all pawns on board, find any one that can be defended
+    // only board pawns need to be defended
+    std::vector<int> available_pawns = get_active_pawns();
+    int num_pawns = available_pawns.size();
+    if (!num_pawns) return false;
+
+    bool can_defend = false;
+
+    // Check first available pawn that can defend itself
+    for (unsigned int i = 0; i < available_pawns.size(); i++) {
+        int base_loc = available_pawns[i];
+        Pawn* p = pawns.at(base_loc).p;
+        state s = pawns.at(base_loc).s;
+        can_defend = is_defense_possible(p, s, die_roll, play_fields);
+        if (can_defend) {
+            if (s == state::INFLIGHT) return true;
+            else assert(false);
+        }
+    }
+
+    // if no defense possible, return false
+    return false;
+}
+
+
+//! Function that launches a defensive move by a player - only played when a defensive move is possible
 int Player::play_defensive_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
     // find all pawns on board, find any one that can be defended
     // only board pawns need to be defended
     std::vector<int> available_pawns = get_active_pawns();
     int num_pawns = available_pawns.size();
-    if (!num_pawns) return play_random_move(die_roll, players, play_fields);
+    if (!num_pawns) { assert(false); return play_random_move(die_roll, players, play_fields); }
 
     bool can_defend = false;
 
@@ -295,8 +426,18 @@ int Player::play_defensive_move(int die_roll, std::vector<Player*> players, std:
         }
     }
 
+    assert(false);
     // if no defense possible, play a random piece
     return play_random_move(die_roll, players, play_fields);
+}
+
+
+//! Function that launches a mixed move by a player
+int Player::play_mixed_move(int die_roll, std::vector<Player*> players, std::vector<Pixel*> play_fields) {
+    if (can_play_defensive_move(die_roll, play_fields)) return play_defensive_move(die_roll, players, play_fields);
+    else if (can_play_attacking_move(die_roll, play_fields)) return play_attacking_move(die_roll, players, play_fields);
+    else if (can_play_fast_move(die_roll)) return play_fast_move(die_roll, players, play_fields);
+    else return play_random_move(die_roll, players, play_fields);
 }
 
 //! Returns the first available pawn on board
@@ -381,15 +522,17 @@ void Player::reset_opponent_piece(Pawn* attacking_pawn, std::vector<Player*>& pl
     auto curr_pixel = attacking_pawn->get_current_pos();
     if (curr_pixel->is_empty()) return;
 
+    Player* mate = get_teammate();
+
     const std::vector<Pawn*>& all_pawns = curr_pixel->get_curr_pawns();
     //has_more_than_one pawn has a possibility of killing a single opponent pawn even if it is colocated with friendly pawn
     Pawn *curr_pawn = nullptr;
     int enemy_pawns = 0;
     for (const auto& pawn : all_pawns) {
-        if (pawn->get_color() != attacking_pawn->get_color()) {
-            curr_pawn = pawn;
-            enemy_pawns++;
-        }
+        if (pawn->get_color() == attacking_pawn->get_color()) continue;
+        if (mate && pawn->get_color() == mate->get_color()) continue;
+        curr_pawn = pawn;
+        enemy_pawns++;
     }
     if (enemy_pawns > 1) return;
 
